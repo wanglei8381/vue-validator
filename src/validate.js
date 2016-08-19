@@ -40,7 +40,7 @@ var stack = {};
  * 3：使用type判断字段类型
  * 4: 使用check判断是否通过
  */
-function validate(rule, value) {
+function validate(rule, value, cb) {
     if (isEmpty(value)) {
         value = rule.default;
     }
@@ -111,11 +111,10 @@ function validate(rule, value) {
                 }
                 break;
             case 'remote':
-                if (isFunction(rule.remote)) {
-                    var result = rule.remote.call(this, value);
-                    if (!result) {
-                        return rule.msg && rule.msg.remote;
-                    }
+                if (isFunction(rule.remote) && isFunction(cb)) {
+                    rule.remote.call(this, value, function (boo) {
+                        boo ? cb() : cb(rule.msg && rule.msg.remote);
+                    });
                 }
                 break;
             case 'enum':

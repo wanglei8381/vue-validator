@@ -55,11 +55,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var vueValidator = __webpack_require__(1);
-	var Vue = __webpack_require__(3);
-	var model = __webpack_require__(5);
-	Vue.use(vueValidator, { obo: 0 });
+	var Vue = __webpack_require__(7);
+	var model = __webpack_require__(9);
+	Vue.use(vueValidator, { autoHint: true });
 
-	vueValidator.addValidation('email', function (val) {
+	vueValidator.addValidation('XXX', function (val) {
 	    return val == 1;
 	});
 
@@ -67,36 +67,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	var vm = new Vue({
 	    el: '#example',
 	    data: {
-	        title: 'a12345',
-	        desc: 'b1234567',
-	        score: 0,
-	        age: 10,
-	        status: 5,
-	        attr: 'c',
-	        a: {
-	            b: 'a.b',
-	            c: {
-	                d: 'd'
-	            }
-	        },
-	        email: '1',
-	        validationError: { a: '' } //可加可不加,按照vue的规范最好加上
+	        title: '',
+	        city: 1,
+	        sex: null,
+	        colors: [],
+	        mobile: '',
+	        validationError: {} //可加可不加,按照vue的规范最好加上
+	    },
+	    computed: {
+	        color() {
+	            //多选框值
+	            let arr = ['a', 'b', 'c', 'd'];
+	            let color = [];
+	            this.colors.forEach((boo, idx) => {
+	                if (boo) {
+	                    color.push(arr[idx]);
+	                }
+	            });
+	            return color;
+	        }
 	    },
 	    init: function () {
-	        this.$validate(model);
+	        this.$initValidate(model);
 	    },
 	    methods: {
 	        submit: function () {
 	            var isValid = this.$isValid();
+	            console.log(JSON.stringify(this.$data));
 	            if (!isValid) {
 	                console.log('不通过');
 	            } else {
 	                console.log('通过');
 	            }
+	        },
+	        check: function () {
+	            console.log('$validate--->', this.$validate('number', '11'));
+	            this.$validate('mobile', false, function (err) {
+	                console.log(err);
+	            });
 	        }
 	    },
-	    validate: function (validationError, validationModel) {
-	        console.log(validationError);
+	    validate: function (error, value, uid, el) {
+	        //error: 错误信息
+	        //value: 元素的值
+	        //uid: 错误的ID,通过this.validationError[uid]
+	        //el: 指令绑定的元素
 	    }
 	});
 
@@ -106,103 +121,112 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var validate = __webpack_require__(2);
 
+	//遇到对问题
+	//单选框多选框待校验
+
 	var validator = {};
 
 	validator.install = function (Vue, options) {
-	    Vue.prototype.$validate = function (model) {
 
-	        this._validationModel = model;
-	        if (!model) return;
-	        var flag = typeof this.$options.validate === 'function';
-	        this.$nextTick(() => {
-
-	            for (var key in this._validationModel) {
-	                this.$set('validationError.' + key, null);
-	                var result = handleKey.call(this, key);
-	                if (!result.isExist) continue;
-	                var self = this;
-	                (function () {
-	                    var rule = self._validationModel[key];
-	                    var errObj = {};
-	                    var _key = key;
-	                    self.$watch(key, nval => {
-	                        var validationError = validate.call(self, rule, nval);
-	                        self.$set('validationError.' + _key, validationError);
-	                        if (validationError) {
-	                            errObj[_key] = validationError;
-	                            if (flag) {
-	                                self.$options.validate.call(self, errObj, this._validationModel);
-	                            }
-	                        }
-	                    });
-	                })();
+	    options = options || {};
+	    if (options.autoHint) {
+	        //引入错误提示的css
+	        __webpack_require__(3);
+	    }
+	    var Vue = __webpack_require__(7);
+	    var __uid = 0;
+	    Vue.directive('validator', {
+	        acceptStatement: true,
+	        bind: function () {
+	            this.__uid = '_' + __uid++;
+	            this.vm.$set('validationError.' + this.__uid, null);
+	            if (options.autoHint) {
+	                autoHint.call(this);
 	            }
-	        });
+	        },
+	        update: function (value, oval) {
+	            //刚进页面不进行校验
+	            if (oval === undefined) return;
+	            if (!this.vm.__validationModel) return;
+	            if (this.arg in this.vm.__validationModel) {
+	                var validationError = validate.call(this, this.vm.__validationModel[this.arg], value, err => {
+	                    this.vm.validationError[this.__uid] = err;
+	                });
+	                this.vm.validationError[this.__uid] = validationError;
+	                if (validationError && typeof this.vm.$options.validate === 'function') {
+	                    this.vm.$options.validate.call(this.vm, validationError, value, this.__uid, this.el);
+	                }
+	            }
+	        },
+	        unbind: function () {}
+	    });
+
+	    //验证一个规则
+	    Vue.prototype.$validate = function (ruleName, value, cb) {
+	        if (!this.__validationModel || !(ruleName in this.__validationModel)) return true;
+	        return validate.call(this, this.__validationModel[ruleName], value, cb);
 	    };
 
+	    //初始化验证
+	    //不执行该方法,则不会进行验证
+	    Vue.prototype.$initValidate = function (model) {
+	        if (!model) return;
+	        this.__validationModel = model;
+	    };
+
+	    //验证所有规则是否通过,返回true:通过,false:不通过
+	    //对remote规则异步校验,不会阻止后续操作
 	    Vue.prototype.$isValid = function () {
-	        if (!this._validationModel) {
+	        if (!this.__validationModel) {
 	            return true;
 	        }
 
-	        var errObj = {};
-	        var validationError,
-	            pass = true;
-	        for (var key in this._validationModel) {
-	            var result = handleKey.call(this, key);
-	            if (!result.isExist) continue;
-
-	            validationError = validate.call(this, this._validationModel[key], result.value);
-	            this.$set('validationError.' + key, validationError);
-	            if (validationError) {
-	                pass = false;
-	                errObj[key] = validationError;
-	                if (options && options.obo) {
-	                    //一个接一个的验证码 one by one
-	                    break;
+	        var pass = true;
+	        this._directives.forEach(dir => {
+	            if (dir.name === 'validator' && dir.arg in this.__validationModel) {
+	                //手动触发校验
+	                dir.update(dir._watcher.value, '');
+	                var validationError = this.validationError[dir.__uid];
+	                if (validationError) {
+	                    pass = false;
+	                    if (validationError && typeof this.$options.validate === 'function') {
+	                        this.$options.validate.call(this, validationError, dir._watcher.value, dir.__uid, dir.el);
+	                    }
 	                }
 	            }
-	        }
-	        if (!pass) {
-	            if (typeof this.$options.validate === 'function') {
-	                this.$options.validate.call(this, errObj, this._validationModel);
-	            }
-	        }
+	        });
+
 	        return pass;
 	    };
 	};
 
-	/**
-	 * 对a.b.c进行解析
-	 * @param key
-	 * @returns {{isExist: boolean, value: *}}
-	 * @todo 抽离出更通用的方法
-	 */
-	function handleKey(key) {
-	    var keys = key.split('.');
-	    var value,
-	        tmpObj,
-	        isExist = true;
-	    if (keys.length > 1) {
-	        tmpObj = this[keys[0]];
-	        for (var i = 1; i < keys.length; i++) {
-	            if (keys[i] in tmpObj) {
-	                tmpObj = tmpObj[keys[i]];
-	            } else {
-	                break;
-	            }
-	        }
-	        if (i === keys.length) {
-	            value = tmpObj;
-	        } else {
-	            isExist = false;
-	        }
-	    } else if (keys[0] in this) {
-	        value = this[keys[0]];
+	//自动提示
+	function autoHint() {
+	    var hint = document.createElement('div');
+	    // hint.setAttribute('v-show', 'validationError.' + this.__uid);
+	    hint.setAttribute('class', 'err-tip-wrap');
+	    hint.innerHTML = '<div class="err-tip"><div class="err-tip-msg">{{validationError.' + this.__uid + '}}</div></div>';
+	    before(hint, this.el);
+	    this.vm.$compile(hint);
+	}
+
+	function before(el, target) {
+	    target.parentNode.insertBefore(el, target);
+	}
+
+	function after(el, target) {
+	    if (target.nextSibling) {
+	        before(el, target.nextSibling);
 	    } else {
-	        isExist = false;
+	        target.parentNode.appendChild(el);
 	    }
-	    return { isExist: isExist, value: value };
+	}
+
+	function getStyle(ele, pseudo) {
+	    return window.getComputedStyle(ele, pseudo);
+	}
+	function getVal(attr) {
+	    return getPropertyValue(attr).call(this);
 	}
 
 	validator.addValidation = validate.addValidation;
@@ -254,12 +278,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * 3：使用type判断字段类型
 	 * 4: 使用check判断是否通过
 	 */
-	function validate(rule, value) {
+	function validate(rule, value, cb) {
 	    if (isEmpty(value)) {
 	        value = rule.default;
 	    }
-	    if (isEmpty(value) && rule.required) {
-	        return rule.msg && rule.msg.required;
+	    if (isEmpty(value)) {
+	        if (rule.required) {
+	            return rule.msg && rule.msg.required;
+	        } else {
+	            return;
+	        }
 	    }
 	    rule.type = rule.type ? rule.type : 'string';
 	    if (isString(rule.type)) {
@@ -321,10 +349,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	                break;
 	            case 'remote':
+	                if (isFunction(rule.remote) && isFunction(cb)) {
+	                    rule.remote.call(this, value, function (boo) {
+	                        boo ? cb() : cb(rule.msg && rule.msg.remote);
+	                    });
+	                }
 	                break;
 	            case 'enum':
 	                if (isArray(rule.enum) && rule.enum.indexOf(value) === -1) {
 	                    return rule.msg && rule.msg.enum;
+	                }
+	                break;
+	            case 'mobile':
+	                if (!/^(\+?0?86\-?)?((13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7})$/.test(value)) {
+	                    return rule.msg && rule.msg.mobile;
 	                }
 	                break;
 	            default:
@@ -395,6 +433,351 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(4);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(6)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/stylus-loader/index.js!./style.styl", function() {
+				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/stylus-loader/index.js!./style.styl");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".err-tip-wrap {\n  display: inline-block;\n  line-height: 0;\n  outline: 0;\n  vertical-align: bottom;\n  position: relative;\n}\n.err-tip-wrap .err-tip {\n  position: absolute;\n  top: 100%;\n  margin-top: 3px;\n  margin-left: 2px;\n  color: #c33;\n  z-index: 1;\n  white-space: nowrap;\n  display: inline-block;\n}\n.err-tip-wrap .err-tip .err-tip-msg {\n  display: inline-block;\n  font-size: 12px;\n  line-height: 16px;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function () {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for (var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if (item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function (modules, mediaQuery) {
+			if (typeof modules === "string") modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for (var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if (typeof id === "number") alreadyImportedModules[id] = true;
+			}
+			for (i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if (typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if (mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if (mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {/*!
@@ -3149,10 +3532,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */config._assetTypes.forEach(function(type){Vue[type]=function(id,definition){if(!definition){return this.options[type+'s'][id];}else { /* istanbul ignore if */if(process.env.NODE_ENV!=='production'){if(type==='component'&&(commonTagRE.test(id)||reservedTagRE.test(id))){warn('Do not use built-in or reserved HTML elements as component '+'id: '+id);}}if(type==='component'&&isPlainObject(definition)){definition.name=id;definition=Vue.extend(definition);}this.options[type+'s'][id]=definition;return definition;}};}); // expose internal transition API
 	extend(Vue.transition,transition);}installGlobalAPI(Vue);Vue.version='1.0.24'; // devtools global hook
 	/* istanbul ignore next */setTimeout(function(){if(config.devtools){if(devtools){devtools.emit('init',Vue);}else if(process.env.NODE_ENV!=='production'&&inBrowser&&/Chrome\/\d+/.test(window.navigator.userAgent)){console.log('Download the Vue Devtools for a better development experience:\n'+'https://github.com/vuejs/vue-devtools');}}},0);module.exports=Vue;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(4)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(8)))
 
 /***/ },
-/* 4 */
+/* 8 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -3280,30 +3663,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 5 */
+/* 9 */
 /***/ function(module, exports) {
 
 	var model = {
-	    title: { required: true, minlength: 3, maxlength: 5, msg: { minlength: 'minlength', maxlength: 'maxlength' } },
-	    desc: { required: true, length: [5, 7], msg: { length: 'length' } },
-	    score: {
+	    title: {
+	        required: true, minlength: 3, maxlength: 5,
+	        msg: { required: '必填', minlength: '最少3个字符', maxlength: '最多5个字符' }
+	    },
+	    city: { type: 'enum', enum: ['2', '3'], msg: { enum: '请选择一个' } },
+	    sex: {
 	        required: true,
-	        type: 'integer+0',
-	        min: 0,
-	        max: 100,
-	        msg: { 'integer+0': 'integer+0', min: 'min', max: 'max' }
+	        msg: { 'required': '必填' }
 	    },
-	    age: { required: true, type: 'number', range: [22, 32], msg: { range: 'range' } },
-	    status: { required: true, type: 'enum', enum: ['1', '2', '3'], msg: { enum: 'enum', required: 'required' } },
-	    attr: {
-	        check: function (value) {
-	            return true;
-	        }, msg: { check: 'check' }
+	    color: {
+	        required: true,
+	        msg: { 'required': '必填' }
 	    },
-	    'a.b': { required: true, minlength: 3, maxlength: 5, msg: { minlength: 'minlength', maxlength: 'maxlength' } },
-	    'a.c.d': { required: true, minlength: 0, maxlength: 5, msg: { minlength: 'minlength', maxlength: 'maxlength' } },
-	    'a.c.e': { required: true, minlength: 3, maxlength: 5, msg: { minlength: 'minlength', maxlength: 'maxlength' } },
-	    'email': { required: true, type: 'email', msg: { email: 'email' } }
+	    mobile: {
+	        required: true, type: 'remote',
+	        remote: function (val, cb) {
+	            setTimeout(function () {
+	                cb(false);
+	            }, 1000);
+	        },
+	        msg: { required: '必填', remote: '手机号不存在' }
+	    },
+	    number: {
+	        type: 'number',
+	        msg: { number: '请输入数字' }
+	    }
 	};
 
 	module.exports = model;

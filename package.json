@@ -1,6 +1,6 @@
 {
   "name": "vue-validator",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "src/index.js",
   "dependencies": {
     "base64-js": "^1.1.2",

@@ -2,25 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="referrer" content="always">
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <base target="_blank">
     <title>validator</title>
+    <style>
+        #example li {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 <ul id="example">
-    <li>title: <input type="text" v-model="title"><span v-show="validationError.title">{{validationError.title}}</span></li>
-    <li>desc: <input type="text" v-model="desc"><span v-show="validationError.desc">{{validationError.desc}}</span></li>
-    <li>score: <input type="text" v-model="score"></li>
-    <li>age: <input type="text" v-model="age"></li>
-    <li>status: <input type="text" v-model="status"></li>
-    <li>attr: <input type="text" v-model="attr"></li>
-    <li>a.b: <input type="text" v-model="a.b"><span v-show="validationError.a.b">{{validationError.a.b}}</span></li>
+    <li>title: <input v-validator:title="title" type="text" v-model="title"></li>
+    <li>city:
+        <select v-validator:city="city" v-model="city">
+            <option value="1">请选择</option>
+            <option value="2">北京</option>
+            <option value="3">上海</option>
+        </select>
+    </li>
+    <li>sex:
+        <label><input type="radio" name="sex" v-model="sex" value="1">男</label>
+        <label><input v-validator:sex="sex" type="radio" name="sex" v-model="sex" value="2">女</label>
+    </li>
+    <li>color:
+        <label><input type="checkbox" v-model="colors[0]">红</label>
+        <label><input type="checkbox" v-model="colors[1]">黄</label>
+        <label><input type="checkbox" v-model="colors[2]">白</label>
+        <label><input v-validator:color="color" type="checkbox" v-model="colors[3]">黑</label>
+    </li>
+    <li>mobile:
+        <label><input v-validator:mobile="mobile" type="text" v-model="mobile"></label>
+    </li>
     <li>
         <button @click="submit" type="button">SUBMIT</button>
+        <button @click="check" type="button">CHECK</button>
     </li>
 </ul>
 <script src="dist/index.js"></script>

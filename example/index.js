@@ -1,9 +1,9 @@
 var vueValidator = require('../src');
 var Vue = require('vue');
 var model = require('./model');
-Vue.use(vueValidator, {obo: 0});
+Vue.use(vueValidator, {autoHint: true});
 
-vueValidator.addValidation('email', function (val) {
+vueValidator.addValidation('XXX', function (val) {
     return val == 1;
 });
 
@@ -11,35 +11,50 @@ Vue.config.devtools = false;
 var vm = new Vue({
     el: '#example',
     data: {
-        title: 'a12345',
-        desc: 'b1234567',
-        score: 0,
-        age: 10,
-        status: 5,
-        attr: 'c',
-        a: {
-            b: 'a.b',
-            c: {
-                d: 'd'
-            }
-        },
-        email: '1',
-        validationError: {a:''}//可加可不加,按照vue的规范最好加上
+        title: '',
+        city: 1,
+        sex: null,
+        colors: [],
+        mobile: '',
+        validationError: {}//可加可不加,按照vue的规范最好加上
+    },
+    computed: {
+        color(){
+            //多选框值
+            let arr = ['a', 'b', 'c', 'd'];
+            let color = [];
+            this.colors.forEach((boo, idx)=> {
+                if (boo) {
+                    color.push(arr[idx]);
+                }
+            });
+            return color;
+        }
     },
     init: function () {
-        this.$validate(model);
+        this.$initValidate(model);
     },
     methods: {
         submit: function () {
             var isValid = this.$isValid();
+            console.log(JSON.stringify(this.$data));
             if (!isValid) {
                 console.log('不通过');
             } else {
                 console.log('通过');
             }
+        },
+        check: function () {
+            console.log('$validate--->', this.$validate('number', '11'));
+            this.$validate('mobile', false, function (err) {
+                console.log(err);
+            });
         }
     },
-    validate: function (validationError, validationModel) {
-        console.log(validationError);
+    validate: function (error, value, uid, el) {
+        //error: 错误信息
+        //value: 元素的值
+        //uid: 错误的ID,通过this.validationError[uid]
+        //el: 指令绑定的元素
     }
 });

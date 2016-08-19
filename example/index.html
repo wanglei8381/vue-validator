@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="referrer" content="always">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <base target="_blank">
+    <title>validator</title>
+</head>
+<body>
+<ul id="example">
+    <li>title: <input type="text" v-model="title"><span v-show="validationError.title">{{validationError.title}}</span></li>
+    <li>desc: <input type="text" v-model="desc"><span v-show="validationError.desc">{{validationError.desc}}</span></li>
+    <li>score: <input type="text" v-model="score"></li>
+    <li>age: <input type="text" v-model="age"></li>
+    <li>status: <input type="text" v-model="status"></li>
+    <li>attr: <input type="text" v-model="attr"></li>
+    <li>a.b: <input type="text" v-model="a.b"><span v-show="validationError.a.b">{{validationError.a.b}}</span></li>
+    <li>
+        <button @click="submit" type="button">SUBMIT</button>
+    </li>
+</ul>
+<script src="dist/index.js"></script>
+</body>
+</html>

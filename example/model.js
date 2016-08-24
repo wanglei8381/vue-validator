@@ -24,6 +24,12 @@ var model = {
     number: {
         type: 'number',
         msg: {number: '请输入数字'}
+    },
+    more: {
+        required: true,
+        type: ['number', 'mobile'],
+        range: [3, 1000000000000],
+        msg: {required: '必填', number: '不是数字', range: '3-1000000000000之间', mobile: '不是手机号'}
     }
 }
 

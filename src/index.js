@@ -1,4 +1,5 @@
 var validate = require('./validate');
+require('./commonRule')(validate);
 
 //遇到对问题
 //单选框多选框待校验

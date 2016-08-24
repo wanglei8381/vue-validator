@@ -51,94 +51,101 @@ function validate(rule, value, cb) {
             return;
         }
     }
-    rule.type = rule.type ? rule.type : 'string';
-    if (isString(rule.type)) {
-        switch (rule.type) {
-            case 'string':
-                if (rule.minlength != null && value.length < rule.minlength) {
-                    return rule.msg && rule.msg.minlength;
-                }
-                if (rule.maxlength != null && value.length > rule.maxlength) {
-                    return rule.msg && rule.msg.maxlength;
-                }
-                if (isArray(rule.length) && (value.length < rule.length[0] || value.length > rule.length[1])) {
-                    return rule.msg && rule.msg.length;
-                }
-                break;
-            case 'number':
-                if (!/^\d+$/.test(value)) {
-                    return rule.msg && rule.msg.number;
-                }
-                var result = validateNumber(rule, value);
-                if (result !== true) {
-                    return result;
-                }
-                break;
-            case 'integer':
-                if (!/^-?[1-9]\d*$/.test(value)) {
-                    return rule.msg && rule.msg.integer;
-                }
-                var result = validateNumber(rule, value);
-                if (result !== true) {
-                    return result;
-                }
-                break;
-            case 'integer+':
-                if (!/^[1-9]\d*$/.test(value)) {
-                    return rule.msg && rule.msg['integer+'];
-                }
-                var result = validateNumber(rule, value);
-                if (result !== true) {
-                    return result;
-                }
-                break;
-            case 'integer+0':
-                if (!/^0|[1-9]\d*$/.test(value)) {
-                    return rule.msg && rule.msg['integer+0'];
-                }
-                var result = validateNumber(rule, value);
-                if (result !== true) {
-                    return result;
-                }
-                break;
-            case 'integer-':
-                if (!/^-[1-9]\d*$/.test(value)) {
-                    return rule.msg && rule.msg['integer-'];
-                }
-                var result = validateNumber(rule, value);
-                if (result !== true) {
-                    return result;
-                }
-                break;
-            case 'remote':
-                if (isFunction(rule.remote) && isFunction(cb)) {
-                    rule.remote.call(this, value, function (boo) {
-                        boo ? cb() : cb(rule.msg && rule.msg.remote);
-                    });
-                }
-                break;
-            case 'enum':
-                if (isArray(rule.enum) && rule.enum.indexOf(value) === -1) {
-                    return rule.msg && rule.msg.enum;
-                }
-                break;
-            case 'mobile':
-                if (!/^(\+?0?86\-?)?((13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7})$/.test(value)) {
-                    return rule.msg && rule.msg.mobile;
-                }
-                break;
-            default:
-                if (rule.type in stack) {
-                    var res = stack[rule.type].call(this, value);
-                    if (!res) {
-                        return rule.msg && rule.msg[rule.type];
-                    }
-                }
-                break;
+
+    var types = rule.type;
+    if (types) {
+        if (!isArray(types)) {
+            types = [types];
         }
-    } else if (isRegExp(rule.type)) {
-        if (!rule.type.test(value)) {
-            return rule.msg && rule.msg.regexp;
+    } else {
+        types = ['string'];
+    }
+
+    for (var i = 0, len = types.length; i < len; i++) {
+        var type = types[i];
+        if (isString(type)) {
+            switch (type) {
+                case 'string':
+                    if (rule.minlength != null && value.length < rule.minlength) {
+                        return rule.msg && rule.msg.minlength;
+                    }
+                    if (rule.maxlength != null && value.length > rule.maxlength) {
+                        return rule.msg && rule.msg.maxlength;
+                    }
+                    if (isArray(rule.length) && (value.length < rule.length[0] || value.length > rule.length[1])) {
+                        return rule.msg && rule.msg.length;
+                    }
+                    break;
+                case 'number':
+                    if (!/^\d+$/.test(value)) {
+                        return rule.msg && rule.msg.number;
+                    }
+                    var result = validateNumber(rule, value);
+                    if (result !== true) {
+                        return result;
+                    }
+                    break;
+                case 'integer':
+                    if (!/^-?[1-9]\d*$/.test(value)) {
+                        return rule.msg && rule.msg.integer;
+                    }
+                    var result = validateNumber(rule, value);
+                    if (result !== true) {
+                        return result;
+                    }
+                    break;
+                case 'integer+':
+                    if (!/^[1-9]\d*$/.test(value)) {
+                        return rule.msg && rule.msg['integer+'];
+                    }
+                    var result = validateNumber(rule, value);
+                    if (result !== true) {
+                        return result;
+                    }
+                    break;
+                case 'integer+0':
+                    if (!/^0|[1-9]\d*$/.test(value)) {
+                        return rule.msg && rule.msg['integer+0'];
+                    }
+                    var result = validateNumber(rule, value);
+                    if (result !== true) {
+                        return result;
+                    }
+                    break;
+                case 'integer-':
+                    if (!/^-[1-9]\d*$/.test(value)) {
+                        return rule.msg && rule.msg['integer-'];
+                    }
+                    var result = validateNumber(rule, value);
+                    if (result !== true) {
+                        return result;
+                    }
+                    break;
+                case 'remote':
+                    if (isFunction(rule.remote) && isFunction(cb)) {
+                        rule.remote.call(this, value, function (boo) {
+                            boo ? cb() : cb(rule.msg && rule.msg.remote);
+                        });
+                    }
+                    break;
+                case 'enum':
+                    if (isArray(rule.enum) && rule.enum.indexOf(value) === -1) {
+                        return rule.msg && rule.msg.enum;
+                    }
+                    break;
+                default:
+                    if (type in stack) {
+                        var res = stack[type].call(this, value);
+                        if (!res) {
+                            return rule.msg && rule.msg[type];
+                        }
+                    }
+                    break;
+            }
+        } else if (isRegExp(type)) {
+            if (!type.test(value)) {
+                return rule.msg && rule.msg.regexp;
+            }
         }
     }
 

@@ -135,7 +135,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //引入错误提示的css
 	        __webpack_require__(4);
 	    }
-	    var Vue = __webpack_require__(8);
 	    var __uid = 0;
 	    Vue.directive('validator', {
 	        acceptStatement: true,

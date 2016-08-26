@@ -13,7 +13,6 @@ validator.install = function (Vue, options) {
         //引入错误提示的css
         require('./style.styl');
     }
-    var Vue = require('vue');
     var __uid = 0;
     Vue.directive('validator', {
         acceptStatement: true,

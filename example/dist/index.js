@@ -55,8 +55,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var vueValidator = __webpack_require__(1);
-	var Vue = __webpack_require__(8);
-	var model = __webpack_require__(10);
+	var Vue = __webpack_require__(9);
+	var model = __webpack_require__(11);
 	Vue.use(vueValidator, { autoHint: true });
 
 	vueValidator.addValidation('XXX', function (val) {
@@ -72,6 +72,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        sex: null,
 	        colors: [],
 	        mobile: '',
+	        pwd: '',
+	        repwd: '',
 	        more: '',
 	        validationError: {} //可加可不加,按照vue的规范最好加上
 	    },
@@ -204,9 +206,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//自动提示
 	function autoHint() {
 	    var hint = document.createElement('div');
-	    // hint.setAttribute('v-show', 'validationError.' + this.__uid);
 	    hint.setAttribute('class', 'err-tip-wrap');
-	    hint.innerHTML = '<div class="err-tip"><div class="err-tip-msg">{{validationError.' + this.__uid + '}}</div></div>';
+	    hint.innerHTML = '<div class="err-tip" v-show="validationError.' + this.__uid + '"><div class="err-tip-msg">{{validationError.' + this.__uid + '}}</div></div>';
 	    before(hint, this.el);
 	    this.vm.$compile(hint);
 	}
@@ -241,7 +242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 验证规则
 	// default: 默认值
-	// type: 类型   string,number,integer,integer+,integer+0,integer-,正则,remote,enum
+	// type: 类型   string,number,integer,integer+,integer+0,integer-,regexp,remote,enum,以及自定义规则
 	// min: 数值的最小值
 	// max: 数值的最大值
 	// range: 数值范围
@@ -266,7 +267,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    enum: null,
 	    remote: null,
 	    check: null,
-	    render: null,
 	    msg: null
 	};
 	//新增规则容器
@@ -554,7 +554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var content = __webpack_require__(5);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(7)(content, {});
+	var update = __webpack_require__(8)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -579,7 +579,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	// module
-	exports.push([module.id, ".err-tip-wrap {\n  display: inline-block;\n  line-height: 0;\n  outline: 0;\n  vertical-align: bottom;\n  position: relative;\n}\n.err-tip-wrap .err-tip {\n  position: absolute;\n  top: 100%;\n  margin-top: 3px;\n  margin-left: 2px;\n  color: #c33;\n  z-index: 1;\n  white-space: nowrap;\n  display: inline-block;\n}\n.err-tip-wrap .err-tip .err-tip-msg {\n  display: inline-block;\n  font-size: 12px;\n  line-height: 16px;\n}\n", ""]);
+	exports.push([module.id, ".err-tip-wrap {\n  display: inline-block;\n  line-height: 0;\n  outline: 0;\n  vertical-align: bottom;\n  position: relative;\n}\n.err-tip-wrap .err-tip {\n  position: absolute;\n  top: 100%;\n  margin-top: 3px;\n  margin-left: 2px;\n  color: #c33;\n  z-index: 1;\n  white-space: nowrap;\n  display: inline-block;\n}\n.err-tip-wrap .err-tip .err-tip-msg {\n  background: url(" + __webpack_require__(7) + ") no-repeat;\n  padding-left: 20px;\n  background-size: contain;\n  display: inline-block;\n  font-size: 12px;\n  line-height: 16px;\n}\n.err-tip-wrap .err-tip .err-tip-img {\n  vertical-align: sub;\n  padding-right: 3px;\n  height: 15px;\n}\n", ""]);
 
 	// exports
 
@@ -639,6 +639,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 7 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo0RTA1QUIzNDI2NDYxMUU2QTU4NDlCNzkyNjVDREMwQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo0RTA1QUIzNTI2NDYxMUU2QTU4NDlCNzkyNjVDREMwQyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjRFMDVBQjMyMjY0NjExRTZBNTg0OUI3OTI2NUNEQzBDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjRFMDVBQjMzMjY0NjExRTZBNTg0OUI3OTI2NUNEQzBDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+gYCyFQAAAlpJREFUeNqsVs1rE3EQfVkvTWkpFatWY6ynSg21WsGLCOlFQdSTmuYP8OgHEbK9xhYTEPSvUBpvSkFtiR7twa/SCrGgRpvWj5K1CSYN2h1ndlsxMdn9xWbgDZvs/N5LJrNv4iEi1I1rHj/nMCPI6GN0MX4yFhgZxlPGOG7S+3oUnpoCNnEcrZ3nMRDegt4TwO6DQPtOpi8D+SywPA+kHwEv7pgoGeNcr7PQx3+4RKACEZyhaEueHseIygVyDamZ5FrdW+Czw9V81eSXaWzfGmVfU8OxOEM02mMyx9XaAhFcoJjPpO+f6L9Dzl73mRZXhUAEfm5LgTLPnAnuXSS6NehcIxx2u/zCra3/FDdw/Eob/EfhGAvP4RrCcexSG18l5KXGE7MXrVtDGNLRtBgaAbw8gcwt3yCEvtMaWjqaJ+BlrkPDFrdmPUSBs2h67D8pOSgCAfiONPDpOtXqdg1IDojANrTvUBfwDarV2Zxd9hT9Kqsdyr1ruFMisIz8kntlyQCKhjpz4YvkbyIwh8+zar0PRoE9ii3KvpI8KwIpvHmgduhUHOg/p1abfij5iWb5+dx9E6sr7v2/zdOWSriTC9fLu6Zwa+zhH1DMJZGKOx96O2VbxfyUu4BwlYykxf3H7MSgMtPORpaeJPqRczG76Qqz+9uuQ5bVbtauY5ZdhxwWTs8aLW5q4UTqb7SNlal78zShExUNd2KpmRjZaEu4ms9p6Scsyz0c1tDLxtXdD3R02/dX+MFcmrFH0V76SX43Wmvpexr423KAsX39zlfrAeU5Z8i01PWQ3wIMAIAfFD2hQo3bAAAAAElFTkSuQmCC"
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -890,7 +896,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {/*!
@@ -3645,10 +3651,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */config._assetTypes.forEach(function(type){Vue[type]=function(id,definition){if(!definition){return this.options[type+'s'][id];}else { /* istanbul ignore if */if(process.env.NODE_ENV!=='production'){if(type==='component'&&(commonTagRE.test(id)||reservedTagRE.test(id))){warn('Do not use built-in or reserved HTML elements as component '+'id: '+id);}}if(type==='component'&&isPlainObject(definition)){definition.name=id;definition=Vue.extend(definition);}this.options[type+'s'][id]=definition;return definition;}};}); // expose internal transition API
 	extend(Vue.transition,transition);}installGlobalAPI(Vue);Vue.version='1.0.24'; // devtools global hook
 	/* istanbul ignore next */setTimeout(function(){if(config.devtools){if(devtools){devtools.emit('init',Vue);}else if(process.env.NODE_ENV!=='production'&&inBrowser&&/Chrome\/\d+/.test(window.navigator.userAgent)){console.log('Download the Vue Devtools for a better development experience:\n'+'https://github.com/vuejs/vue-devtools');}}},0);module.exports=Vue;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(9)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(10)))
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -3776,7 +3782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	var model = {
@@ -3794,23 +3800,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	        msg: { 'required': '必填' }
 	    },
 	    mobile: {
-	        required: true, type: 'remote',
+	        required: true,
+	        type: ['mobile', 'remote'],
 	        remote: function (val, cb) {
 	            setTimeout(function () {
 	                cb(false);
 	            }, 1000);
 	        },
-	        msg: { required: '必填', remote: '手机号不存在' }
+	        msg: { required: '必填', mobile: '手机格式不正确', remote: '手机号不存在' }
 	    },
-	    number: {
-	        type: 'number',
-	        msg: { number: '请输入数字' }
+	    pwd: {
+	        required: true,
+	        length: [3, 10],
+	        msg: { required: '必填', length: '密码长度在3-10' }
+	    },
+	    repwd: {
+	        required: true,
+	        length: [3, 10],
+	        check: function (val) {
+	            return val === this.vm.pwd;
+	        },
+	        msg: { required: '必填', length: '密码长度在3-10', check: '两次密码不一致' }
 	    },
 	    more: {
 	        required: true,
-	        type: ['number', 'mobile'],
-	        range: [3, 1000000000000],
-	        msg: { required: '必填', number: '不是数字', range: '3-1000000000000之间', mobile: '不是手机号' }
+	        type: 'number',
+	        range: [1, 10],
+	        check: function (val) {
+	            return val % 2 === 0;
+	        },
+	        msg: { required: '必填', number: '不是数字', range: '1-10之间', check: '不是1-10之间对偶数' }
 	    }
 	};
 

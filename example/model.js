@@ -13,23 +13,36 @@ var model = {
         msg: {'required': '必填'}
     },
     mobile: {
-        required: true, type: 'remote',
+        required: true,
+        type: ['mobile', 'remote'],
         remote: function (val, cb) {
             setTimeout(function () {
                 cb(false);
             }, 1000);
         },
-        msg: {required: '必填', remote: '手机号不存在'}
+        msg: {required: '必填', mobile: '手机格式不正确', remote: '手机号不存在'}
     },
-    number: {
-        type: 'number',
-        msg: {number: '请输入数字'}
+    pwd: {
+        required: true,
+        length: [3, 10],
+        msg: {required: '必填', length: '密码长度在3-10'}
+    },
+    repwd: {
+        required: true,
+        length: [3, 10],
+        check: function (val) {
+            return val === this.vm.pwd
+        },
+        msg: {required: '必填', length: '密码长度在3-10', check: '两次密码不一致'}
     },
     more: {
         required: true,
-        type: ['number', 'mobile'],
-        range: [3, 1000000000000],
-        msg: {required: '必填', number: '不是数字', range: '3-1000000000000之间', mobile: '不是手机号'}
+        type: 'number',
+        range: [1, 10],
+        check: function (val) {
+            return val % 2 === 0;
+        },
+        msg: {required: '必填', number: '不是数字', range: '1-10之间', check: '不是1-10之间对偶数'}
     }
 }
 

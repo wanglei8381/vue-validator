@@ -2,7 +2,7 @@
 
 // 验证规则
 // default: 默认值
-// type: 类型   string,number,integer,integer+,integer+0,integer-,正则,remote,enum
+// type: 类型   string,number,integer,integer+,integer+0,integer-,regexp,remote,enum,以及自定义规则
 // min: 数值的最小值
 // max: 数值的最大值
 // range: 数值范围
@@ -27,7 +27,6 @@ var rules = {
     enum: null,
     remote: null,
     check: null,
-    render: null,
     msg: null
 };
 //新增规则容器

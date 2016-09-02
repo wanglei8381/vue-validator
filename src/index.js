@@ -84,9 +84,8 @@ validator.install = function (Vue, options) {
 //自动提示
 function autoHint() {
     var hint = document.createElement('div');
-    // hint.setAttribute('v-show', 'validationError.' + this.__uid);
     hint.setAttribute('class', 'err-tip-wrap');
-    hint.innerHTML = '<div class="err-tip"><div class="err-tip-msg">{{validationError.' + this.__uid + '}}</div></div>';
+    hint.innerHTML = '<div class="err-tip" v-show="validationError.' + this.__uid + '"><div class="err-tip-msg">{{validationError.' + this.__uid + '}}</div></div>';
     before(hint, this.el);
     this.vm.$compile(hint);
 }

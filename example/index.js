@@ -16,6 +16,8 @@ var vm = new Vue({
         sex: null,
         colors: [],
         mobile: '',
+        pwd: '',
+        repwd: '',
         more: '',
         validationError: {}//可加可不加,按照vue的规范最好加上
     },

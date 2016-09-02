@@ -11,7 +11,8 @@ module.exports = {
     module: {
         loaders: [
             {test: /\.styl$/, loader: "style!css!stylus"},
-            {test: /\.js$/, loader: 'babel'}
+            {test: /\.js$/, loader: 'babel'},
+            {test: /.(png)|(jpg)$/, loader: 'url?limit=50000'}
         ]
     }
 }

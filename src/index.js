@@ -28,7 +28,7 @@ validator.install = function (Vue, options) {
             if (oval === undefined) return;
             if (!this.vm.__validationModel) return;
             if (this.arg in this.vm.__validationModel) {
-                var validationError = validate.call(this, this.vm.__validationModel[this.arg], value, (err)=> {
+                var validationError = validate.call(this.vm, this.vm.__validationModel[this.arg], value, (err)=> {
                     this.vm.validationError[this.__uid] = err;
                 });
                 this.vm.validationError[this.__uid] = validationError;

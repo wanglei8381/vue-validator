@@ -1,6 +1,9 @@
 #vue-validator
 基于vue的验证插件
 
+####v0.0.6
+1:修改model的this指向vm
+
 ####v0.0.5
 1:允许多个type校验
 2:提取通用的规则校验

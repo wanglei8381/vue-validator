@@ -1,14 +1,11 @@
 {
-  "name": "wl-vue-validator",
+  "name": "vue-validator",
+  "description": "Validator component for Vue.js",
   "version": "0.0.6",
   "main": "src/index.js",
+  "author": "lei.wang@wuage.com",
   "dependencies": {
-    "base64-js": "^1.1.2",
-    "director": "^1.2.8",
-    "md5": "^2.1.0",
-    "vue": "^1.0.24",
-    "vue-router": "^0.7.13",
-    "zepto": "^1.0.1"
+    "vue": "^1.0.24"
   },
   "devDependencies": {
     "babel-core": "^6.9.0",
@@ -30,6 +27,10 @@
     "vue-html-loader": "^1.2.2",
     "vue-loader": "^8.5.2",
     "vue-style-loader": "^1.0.0",
+    "base64-js": "^1.1.2",
+    "director": "^1.2.8",
+    "md5": "^2.1.0",
+    "vue-router": "^0.7.13",
     "webpack": "^1.13.1"
   }
 }

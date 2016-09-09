@@ -14,13 +14,13 @@ var model = {
     },
     mobile: {
         required: true,
-        type: ['mobile', 'remote'],
+        type: ['mobile', 'remote' ,'XXX'],
         remote: function (val, cb) {
             setTimeout(function () {
                 cb(false);
             }, 1000);
         },
-        msg: {required: '必填', mobile: '手机格式不正确', remote: '手机号不存在'}
+        msg: {required: '必填', mobile: '手机格式不正确', remote: '手机号不存在',XXX:''}
     },
     pwd: {
         required: true,
@@ -31,7 +31,7 @@ var model = {
         required: true,
         length: [3, 10],
         check: function (val) {
-            return val === this.vm.pwd
+            return val === this.pwd
         },
         msg: {required: '必填', length: '密码长度在3-10', check: '两次密码不一致'}
     },

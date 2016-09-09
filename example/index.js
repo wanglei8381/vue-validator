@@ -40,6 +40,9 @@ var vm = new Vue({
     methods: {
         submit: function () {
             var isValid = this.$isValid();
+            this.$validate('mobile', '18210695143', function (err) {
+                console.log(err);
+            });
             console.log(JSON.stringify(this.$data));
             if (!isValid) {
                 console.log('不通过');
@@ -49,7 +52,7 @@ var vm = new Vue({
         },
         check: function () {
             console.log('$validate--->', this.$validate('number', '11'));
-            this.$validate('mobile', false, function (err) {
+            this.$validate('mobile', '18210695143', function (err) {
                 console.log(err);
             });
         }

@@ -96,6 +96,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    methods: {
 	        submit: function () {
 	            var isValid = this.$isValid();
+	            this.$validate('mobile', '18210695143', function (err) {
+	                console.log(err);
+	            });
 	            console.log(JSON.stringify(this.$data));
 	            if (!isValid) {
 	                console.log('不通过');
@@ -105,7 +108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        check: function () {
 	            console.log('$validate--->', this.$validate('number', '11'));
-	            this.$validate('mobile', false, function (err) {
+	            this.$validate('mobile', '18210695143', function (err) {
 	                console.log(err);
 	            });
 	        }
@@ -152,7 +155,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (oval === undefined) return;
 	            if (!this.vm.__validationModel) return;
 	            if (this.arg in this.vm.__validationModel) {
-	                var validationError = validate.call(this, this.vm.__validationModel[this.arg], value, err => {
+	                var validationError = validate.call(this.vm, this.vm.__validationModel[this.arg], value, err => {
 	                    this.vm.validationError[this.__uid] = err;
 	                });
 	                this.vm.validationError[this.__uid] = validationError;
@@ -3801,13 +3804,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    mobile: {
 	        required: true,
-	        type: ['mobile', 'remote'],
+	        type: ['mobile', 'remote', 'XXX'],
 	        remote: function (val, cb) {
 	            setTimeout(function () {
 	                cb(false);
 	            }, 1000);
 	        },
-	        msg: { required: '必填', mobile: '手机格式不正确', remote: '手机号不存在' }
+	        msg: { required: '必填', mobile: '手机格式不正确', remote: '手机号不存在', XXX: '' }
 	    },
 	    pwd: {
 	        required: true,
@@ -3818,7 +3821,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        required: true,
 	        length: [3, 10],
 	        check: function (val) {
-	            return val === this.vm.pwd;
+	            return val === this.pwd;
 	        },
 	        msg: { required: '必填', length: '密码长度在3-10', check: '两次密码不一致' }
 	    },

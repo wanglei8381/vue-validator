@@ -59,8 +59,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var model = __webpack_require__(11);
 	Vue.use(vueValidator, { autoHint: true });
 
-	vueValidator.addValidation('XXX', function (val) {
-	    return val == 1;
+	vueValidator.addValidation('mobile', function (value) {
+	    return (/^1\d{10}$/.test(value)
+	    );
 	});
 
 	Vue.config.devtools = false;

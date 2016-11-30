@@ -1,6 +1,9 @@
 #vue-validator
 基于vue的验证插件
 
+####v0.0.7
+支持vue2.0
+
 ####v0.0.6
 1:修改model的this指向vm
 

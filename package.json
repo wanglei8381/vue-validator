@@ -4,9 +4,6 @@
   "version": "0.0.6",
   "main": "src/index.js",
   "author": "lei.wang@wuage.com",
-  "dependencies": {
-    "vue": "^1.0.24"
-  },
   "devDependencies": {
     "babel-core": "^6.9.0",
     "babel-loader": "^6.2.4",

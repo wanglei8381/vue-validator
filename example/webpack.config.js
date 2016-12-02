@@ -10,9 +10,16 @@ module.exports = {
     },
     module: {
         loaders: [
+            {test: /\.css/, loader: "style!css"},
             {test: /\.styl$/, loader: "style!css!stylus"},
             {test: /\.js$/, loader: 'babel'},
             {test: /.(png)|(jpg)$/, loader: 'url?limit=50000'}
         ]
+    },
+    resolve: {
+        alias: {
+            'vue$': 'vue/dist/vue.js'
+        },
+        extensions: ['', '.js', '.json', '.vue']
     }
 }

@@ -45,9 +45,9 @@ function validate(rule, value, cb) {
     }
     if (isEmpty(value)) {
         if (rule.required) {
-            return rule.msg && rule.msg.required;
+            return cb(rule.msg && rule.msg.required);
         } else {
-            return;
+            return cb();
         }
     }
 
@@ -66,62 +66,62 @@ function validate(rule, value, cb) {
             switch (type) {
                 case 'string':
                     if (rule.minlength != null && value.length < rule.minlength) {
-                        return rule.msg && rule.msg.minlength;
+                        return cb(rule.msg && rule.msg.minlength);
                     }
                     if (rule.maxlength != null && value.length > rule.maxlength) {
-                        return rule.msg && rule.msg.maxlength;
+                        return cb(rule.msg && rule.msg.maxlength);
                     }
                     if (isArray(rule.length) && (value.length < rule.length[0] || value.length > rule.length[1])) {
-                        return rule.msg && rule.msg.length;
+                        return cb(rule.msg && rule.msg.length);
                     }
                     break;
                 case 'number':
                     if (!/^\d+$/.test(value)) {
-                        return rule.msg && rule.msg.number;
+                        return cb(rule.msg && rule.msg.number);
                     }
                     var result = validateNumber(rule, value);
                     if (result !== true) {
-                        return result;
+                        return cb(result);
                     }
                     break;
                 case 'integer':
                     if (!/^-?[1-9]\d*$/.test(value)) {
-                        return rule.msg && rule.msg.integer;
+                        return cb(rule.msg && rule.msg.integer);
                     }
                     var result = validateNumber(rule, value);
                     if (result !== true) {
-                        return result;
+                        return cb(result);
                     }
                     break;
                 case 'integer+':
                     if (!/^[1-9]\d*$/.test(value)) {
-                        return rule.msg && rule.msg['integer+'];
+                        return cb(rule.msg && rule.msg['integer+']);
                     }
                     var result = validateNumber(rule, value);
                     if (result !== true) {
-                        return result;
+                        return cb(result);
                     }
                     break;
                 case 'integer+0':
                     if (!/^0|[1-9]\d*$/.test(value)) {
-                        return rule.msg && rule.msg['integer+0'];
+                        return cb(rule.msg && rule.msg['integer+0']);
                     }
                     var result = validateNumber(rule, value);
                     if (result !== true) {
-                        return result;
+                        return cb(result);
                     }
                     break;
                 case 'integer-':
                     if (!/^-[1-9]\d*$/.test(value)) {
-                        return rule.msg && rule.msg['integer-'];
+                        return cb(rule.msg && rule.msg['integer-']);
                     }
                     var result = validateNumber(rule, value);
                     if (result !== true) {
-                        return result;
+                        return cb(result);
                     }
                     break;
                 case 'remote':
-                    if (isFunction(rule.remote) && isFunction(cb)) {
+                    if (isFunction(rule.remote)) {
                         rule.remote.call(this, value, function (boo) {
                             boo ? cb() : cb(rule.msg && rule.msg.remote);
                         });
@@ -129,30 +129,32 @@ function validate(rule, value, cb) {
                     break;
                 case 'enum':
                     if (isArray(rule.enum) && rule.enum.indexOf(value) === -1) {
-                        return rule.msg && rule.msg.enum;
+                        return cb(rule.msg && rule.msg.enum);
                     }
                     break;
                 default:
                     if (type in stack) {
                         var res = stack[type].call(this, value);
                         if (!res) {
-                            return rule.msg && rule.msg[type];
+                            return cb(rule.msg && rule.msg[type]);
                         }
                     }
                     break;
             }
         } else if (isRegExp(type)) {
             if (!type.test(value)) {
-                return rule.msg && rule.msg.regexp;
+                return cb(rule.msg && rule.msg.regexp);
             }
         }
     }
 
     if (isFunction(rule.check)) {
         if (!rule.check.call(this, value)) {
-            return rule.msg && rule.msg.check;
+            return cb(rule.msg && rule.msg.check);
         }
     }
+
+    cb();
 
 }
 

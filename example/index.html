@@ -28,10 +28,10 @@
         <label><input v-validator:sex="sex" type="radio" name="sex" v-model="sex" value="2">女</label>
     </li>
     <li>color:
-        <label><input type="checkbox" v-model="colors[0]">红</label>
-        <label><input type="checkbox" v-model="colors[1]">黄</label>
-        <label><input type="checkbox" v-model="colors[2]">白</label>
-        <label><input v-validator:color="color" type="checkbox" v-model="colors[3]">黑</label>
+        <label><input type="checkbox" v-model="colors" value="红">红</label>
+        <label><input type="checkbox" v-model="colors" value="黄">黄</label>
+        <label><input type="checkbox" v-model="colors" value="白">白</label>
+        <label><input v-validator:color="colors" type="checkbox" v-model="colors" value="黑">黑</label>
     </li>
     <li>mobile:
         <label><input v-validator:mobile="mobile" type="text" v-model="mobile"></label>

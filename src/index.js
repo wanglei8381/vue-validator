@@ -47,7 +47,7 @@ validator.install = function (Vue, options) {
             var errorCache = cache[vnode.context._uid];
             var errorObj = errorCache[el._erruid];
             errorObj.value = binding.value;
-            //刚进页面和值没有更改不进行校验
+            // 刚进页面和值没有更改不进行校验
             if (binding.value === binding.oldValue) return;
 
             var vm = vnode.context;

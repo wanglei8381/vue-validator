@@ -58,7 +58,7 @@ validator.install = function (Vue, options) {
             var validationModel = vm.__validationModel[binding.arg];
 
             if (validationModel) {
-                validate.call(vm, validationModel, binding.value, function (validationError) {
+                validate.call(vm, validationModel, binding.value, el, function (validationError) {
 
                     errorObj.msg = validationError;
                     errorObj.check();

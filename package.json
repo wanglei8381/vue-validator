@@ -1,33 +1,23 @@
 {
-  "name": "vue-validator",
-  "description": "Validator component for Vue.js",
-  "version": "1.0.0",
-  "main": "src/index.js",
-  "author": "lei.wang@wuage.com",
+  "name": "vue-lite-validator",
+  "description": "Simple Vue.js input validation plugin",
+  "version": "0.0.2",
+  "keywords": [
+    "VueJS",
+    "Vue",
+    "validation",
+    "validator"
+  ],
+  "license": "MIT",
+  "author": "wanglei",
+  "scripts": {
+    "dev": "wag dev",
+    "start": "wag start",
+    "build": "wag build --remove",
+    "test": "wag test"
+  },
   "devDependencies": {
-    "babel-core": "^6.9.0",
-    "babel-loader": "^6.2.4",
-    "babel-plugin-transform-runtime": "^6.9.0",
-    "babel-preset-es2015": "^6.9.0",
-    "css-loader": "^0.23.1",
-    "director": "^1.2.8",
-    "extract-text-webpack-plugin": "^1.0.1",
-    "file-loader": "^0.9.0",
-    "html-loader": "^0.4.3",
-    "jsx-loader": "^0.13.2",
-    "less": "^2.7.1",
-    "less-loader": "^2.2.3",
-    "sass-loader": "^3.2.0",
-    "style-loader": "^0.13.1",
-    "stylus-loader": "^2.1.0",
-    "url-loader": "^0.5.7",
-    "vue-html-loader": "^1.2.2",
-    "vue-loader": "^8.5.2",
-    "vue-style-loader": "^1.0.0",
-    "base64-js": "^1.1.2",
-    "director": "^1.2.8",
-    "md5": "^2.1.0",
-    "vue-router": "^0.7.13",
-    "webpack": "^1.13.1"
+    "wag-cli": "3.2.0",
+    "vue": "^2.3.2"
   }
 }

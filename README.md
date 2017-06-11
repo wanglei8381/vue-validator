@@ -83,7 +83,7 @@ v-validator:title="title"
 <input 
 v-model="title"
 v-validator:title="title" 
-key="title">
+data-key="title">
 // 或
 <input 
 v-model="title"
@@ -208,3 +208,16 @@ type: ['mobile', 'remote']
   msg: {check: 'error'}
 }
 ```
+
+## $isValid
+
+插件会将错误信息保存在errors对象中,
+可以使用this.$isValid()函数验证所有规则是否通过,全部通过返回true，否则false
+该函数对异步返回值不考虑，可以使用$validate函数单独进行异步校验
+
+## $validate
+
+this.$validate(rule,value,cb)
+rule: 规则名称
+value：验证的值
+cb: 回调函数，返回值错误信息

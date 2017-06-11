@@ -47,7 +47,7 @@ validator.install = function (Vue, options = {}) {
         value = value.value
       }
       if (!key) {
-        key = el.getAttribute('key')
+        key = el.getAttribute('data-key')
       }
       if (!key) {
         key = binding.arg

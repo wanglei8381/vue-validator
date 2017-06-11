@@ -45,9 +45,9 @@ validator.install = function (Vue, options = {}) {
         _isObject = true
         key = value.key
         value = value.value
-        if (!key) {
-          key = el.getAttribute('key')
-        }
+      }
+      if (!key) {
+        key = el.getAttribute('key')
       }
       if (!key) {
         key = binding.arg
@@ -138,7 +138,7 @@ validator.install = function (Vue, options = {}) {
   }
 
   // 验证所有规则是否通过,返回true:通过,false:不通过
-  // 对remote规则异步校验,不会阻止后续操作
+  // 不对remote规则异步校验,需要手动调用$validate验证一个规则
   Vue.prototype.$isValid = function () {
     if (!this.__validationModel) {
       return true

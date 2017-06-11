@@ -98,7 +98,7 @@ v-validator:title="{value:title, key:'title'}"
 插件在vue组件的data中添加一个errors属性，保存错误信息，可以自己设置错误提示
 errors的key的可以这样设置如下：
 ```
-1. 在dom节点上添加key属性，如：<input v-model="title" v-validator:title="title" key="title">
+1. 在dom节点上添加key属性，如：<input v-model="title" v-validator:title="title" data-key="title">
 2. 指令的值为普通对象，如：<input v-model="title" v-validator:title="{value:title, key:'title'}">
 3. 如果不设置，默认会取指令的arg作为key,如：<input v-model="title" v-validator:title="title">
 ```

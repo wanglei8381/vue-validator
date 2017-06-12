@@ -8,6 +8,7 @@ import {
 } from './util'
 
 import { rules } from './buildinRule'
+import { messages } from './config'
 
 /**
  * 验证规则：
@@ -18,7 +19,7 @@ import { rules } from './buildinRule'
  */
 function validate (rule, ctx, cb) {
   let {
-    msg = {},
+    msg = messages,
     required,
     type,
     minlength,

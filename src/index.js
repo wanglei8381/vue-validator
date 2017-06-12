@@ -1,6 +1,7 @@
 import validate from './validate'
 import { addValidation } from './buildinRule'
 import { isObject } from './util'
+import { disposeMessages } from './config'
 
 const validator = {}
 
@@ -11,6 +12,8 @@ validator.install = function (Vue, options = {}) {
   }
 
   let { field = 'errors' } = options
+
+  disposeMessages(options.messages)
 
   let uid = 0
 
@@ -66,6 +69,8 @@ validator.install = function (Vue, options = {}) {
         msg: null,
         // 保存的值
         value: value,
+        // 原始数据
+        data: binding.value,
         oldValue: value,
         // value是对象
         isObject: _isObject,
@@ -102,6 +107,7 @@ validator.install = function (Vue, options = {}) {
       const context = errorCache[el._erruid]
       context.value = context.isObject ? binding.value.value : binding.value
       context.oldValue = context.isObject ? binding.oldValue.value : binding.oldValue
+      context.data = binding.value
       // 刚进页面和值没有更改不进行校验
       if (context.value === context.oldValue) return
 

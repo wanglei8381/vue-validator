@@ -12,6 +12,7 @@ Vue.use(validator, options)
 ```
   autoHint: 是否自动引入错误提示（在元素后面追加错误dom节点，引入错误样式，比较简单的错误提示），默认false 
   field: 验证插件默认会在vue组件上添加一个属性，用于保存错误对象信息，默认是errors
+  messages: 全局错误提示信息，默认空
 ```
 
 > addValidation: 添加一个通用的规则

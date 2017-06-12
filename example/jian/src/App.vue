@@ -1,6 +1,6 @@
 <template>
   <ul id="example">
-    <li>title: <input v-validator:title="{value:title, key:'title'}" key="title" type="text" v-model="title"></li>
+    <li>title: <input v-validator:title="title" data-key="title2" type="text" v-model="title"></li>
     <li>city:
       <select v-validator:city="city" v-model="city">
         <option value="1">请选择</option>
@@ -54,15 +54,13 @@
     methods: {
       submit: function () {
         var isValid = this.$isValid()
-        this.$validate('mobile', '18210695143', function (err) {
-          console.log(err)
+        this.$validate('mobile', this.mobile, function (err) {
+          if (!isValid && !err) {
+            console.log('不通过')
+          } else {
+            console.log('通过')
+          }
         })
-        console.log(JSON.stringify(this.$data))
-        if (!isValid) {
-          console.log('不通过')
-        } else {
-          console.log('通过')
-        }
       },
       check: function () {
         this.$validate('number', '11', function (err) {
@@ -81,4 +79,7 @@
   }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
+  #example li {
+    margin-top 30px
+  }
 </style>

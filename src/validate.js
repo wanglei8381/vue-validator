@@ -28,6 +28,10 @@ function validate (rule, ctx, cb) {
     max
   } = rule
 
+  let proxy = (key) => {
+    cb(msg[key] || messages[key])
+  }
+
   let { value } = ctx
 
   if (isEmpty(value)) {
@@ -36,7 +40,7 @@ function validate (rule, ctx, cb) {
 
   if (isEmpty(value)) {
     if (required) {
-      return cb(msg.required)
+      return proxy('required')
     } else {
       return cb()
     }
@@ -59,63 +63,63 @@ function validate (rule, ctx, cb) {
         case 'string':
           value = String(value)
           if (isNumber(minlength) && value.length < minlength) {
-            return cb(msg.minlength)
+            return proxy('minlength')
           }
 
           if (isNumber(maxlength) && value.length > maxlength) {
-            return cb(msg.maxlength)
+            return proxy('maxlength')
           }
 
           if (isArray(rule.length) && (value.length < rule.length[0] || value.length > rule.length[1])) {
-            return cb(rule.msg && rule.msg.length)
+            return proxy('length')
           }
           break
         case 'number':
           value = Number(value)
           if (!value) {
-            return cb(msg.number)
+            return proxy('number')
           }
           if (isNumber(min) && value < min) {
-            return cb(msg.min)
+            return proxy('min')
           }
           if (isNumber(max) && value > max) {
-            return cb(msg.max)
+            return proxy('max')
           }
           if (isArray(rule.range) && (value < rule.range[0] || value > rule.range[1])) {
-            return cb(msg.range)
+            return proxy('range')
           }
           break
         case 'remote':
           if (isFunction(rule.remote)) {
             rule.remote.call(this, value, ctx, function (boo) {
-              boo ? cb() : cb(msg.remote)
+              boo ? cb() : proxy('remote')
             })
           }
           break
         case 'enum':
           if (isArray(rule.enum) && rule.enum.indexOf(value) === -1) {
-            return cb(msg.enum)
+            return proxy('enum')
           }
           break
         default:
           if (type in rules) {
             var res = rules[type].call(this, value, ctx)
             if (!res) {
-              return cb(rule.msg && rule.msg[type])
+              return proxy(type)
             }
           }
           break
       }
     } else if (isRegExp(type)) {
       if (!type.test(value)) {
-        return cb(msg.regexp)
+        return proxy('regexp')
       }
     }
   }
 
   if (isFunction(rule.check)) {
     if (!rule.check.call(this, value, ctx)) {
-      return cb(msg.check)
+      return proxy('check')
     }
   }
 

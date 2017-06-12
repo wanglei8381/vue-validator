@@ -8,7 +8,7 @@ const validator = {}
 validator.install = function (Vue, options = {}) {
   if (options.autoHint) {
     // 引入错误提示的css
-    require('./style.styl')
+    require('./style.css')
   }
 
   let { field = 'errors' } = options
@@ -37,18 +37,11 @@ validator.install = function (Vue, options = {}) {
       el._erruid = id
 
       // 对错误对象设置属性
-      // 默认先从value取key
-      // 如果不存在从dom节点获取key作为属性
+      // 从dom节点获取key作为属性
       // 如果还不存在用指令的arg作为参数，如果存在多个这样的arg会新的会覆盖久的
       // 建议都设置一个key
       let value = binding.value
       let key
-      let _isObject = false
-      if (isObject(value)) {
-        _isObject = true
-        key = value.key
-        value = value.value
-      }
       if (!key) {
         key = el.getAttribute('data-key')
       }
@@ -69,11 +62,7 @@ validator.install = function (Vue, options = {}) {
         msg: null,
         // 保存的值
         value: value,
-        // 原始数据
-        data: binding.value,
         oldValue: value,
-        // value是对象
-        isObject: _isObject,
         // 验证规则
         rule: binding.arg,
         // 验证函数
@@ -105,11 +94,10 @@ validator.install = function (Vue, options = {}) {
 
       const errorCache = cache[vm._uid]
       const context = errorCache[el._erruid]
-      context.value = context.isObject ? binding.value.value : binding.value
-      context.oldValue = context.isObject ? binding.oldValue.value : binding.oldValue
-      context.data = binding.value
-      // 刚进页面和值没有更改不进行校验
-      if (context.value === context.oldValue) return
+      context.value = binding.value
+      context.oldValue = binding.oldValue
+      // 刚进页面和值没有更改不进行校验,但对于引用类型不拦截
+      if (context.value === context.oldValue && !isObject(context.value)) return
 
       // 验证规则
       var validationModel = vm.__validationModel[binding.arg]

@@ -53,22 +53,23 @@
     },
     methods: {
       submit: function () {
-        var isValid = this.$isValid()
-        this.$validate('mobile', this.mobile, function (err) {
-          if (!isValid && !err) {
-            console.log('不通过')
-          } else {
-            console.log('通过')
-          }
+        this.$isValid().then(() => {
+          console.log('--->通过')
+        }).catch(() => {
+          console.log('--->没通过')
         })
       },
       check: function () {
-        this.$validate('number', '11', function (err) {
-          console.log('$validate--->', err)
+        this.$validate('number', '11').then(() => {
+          console.log('number----OK')
+        }).catch((err) => {
+          console.log('number', err)
         })
 
-        this.$validate('mobile', '18210695143', function (err) {
-          console.log(err)
+        this.$validate('mobile', '18210695143').then(() => {
+          console.log('mobile----OK')
+        }).catch((err) => {
+          console.log('mobile', err)
         })
       }
     },

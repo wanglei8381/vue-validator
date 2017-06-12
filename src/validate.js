@@ -1,3 +1,4 @@
+/* eslint-disable prefer-promise-reject-errors */
 import {
   isRegExp,
   isString,
@@ -17,113 +18,137 @@ import { messages } from './config'
  * 3：使用type判断字段类型
  * 4: 使用check判断是否通过
  */
-function validate (rule, ctx, cb) {
+function validate (rule, ctx) {
+  return new Promise((resolve, reject) => {
+    let {
+      msg = messages,
+      required,
+      type,
+      check
+    } = rule
+
+    let proxy = (key) => {
+      reject(msg[key] || messages[key])
+    }
+
+    let { value } = ctx
+
+    if (isEmpty(value)) {
+      value = rule.default
+    }
+
+    if (isEmpty(value)) {
+      if (required) {
+        return proxy('required')
+      } else {
+        return resolve()
+      }
+    }
+
+    // 验证类型，默认是string
+    let types = type
+    if (types) {
+      if (!isArray(types)) {
+        types = [types]
+      }
+    } else {
+      types = ['string']
+    }
+
+    let promises = types.map((type) => verify.call(this, type, value, ctx, rule))
+
+    Promise.all(promises).then(() => {
+      if (isFunction(check)) {
+        if (!check.call(this, value, ctx)) {
+          return proxy('check')
+        }
+      }
+
+      resolve()
+    }).catch(proxy)
+  })
+}
+
+function verify (type, value, ctx, rule) {
   let {
-    msg = messages,
-    required,
-    type,
     minlength,
     maxlength,
+    length,
     min,
-    max
+    max,
+    range,
+    remote
   } = rule
 
-  let proxy = (key) => {
-    cb(msg[key] || messages[key])
-  }
-
-  let { value } = ctx
-
-  if (isEmpty(value)) {
-    value = rule.default
-  }
-
-  if (isEmpty(value)) {
-    if (required) {
-      return proxy('required')
-    } else {
-      return cb()
-    }
-  }
-
-  // 验证类型，默认是string
-  let types = type
-  if (types) {
-    if (!isArray(types)) {
-      types = [types]
-    }
-  } else {
-    types = ['string']
-  }
-
-  for (let i = 0, len = types.length; i < len; i++) {
-    let type = types[i]
+  return new Promise((resolve, reject) => {
     if (isString(type)) {
       switch (type) {
         case 'string':
           value = String(value)
           if (isNumber(minlength) && value.length < minlength) {
-            return proxy('minlength')
+            return reject('minlength')
           }
 
           if (isNumber(maxlength) && value.length > maxlength) {
-            return proxy('maxlength')
+            return reject('maxlength')
           }
 
-          if (isArray(rule.length) && (value.length < rule.length[0] || value.length > rule.length[1])) {
-            return proxy('length')
+          if (isArray(length) && (value.length < length[0] || value.length > length[1])) {
+            return reject('length')
           }
+
+          resolve()
           break
         case 'number':
           value = Number(value)
           if (!value) {
-            return proxy('number')
+            return reject('number')
           }
           if (isNumber(min) && value < min) {
-            return proxy('min')
+            return reject('min')
           }
           if (isNumber(max) && value > max) {
-            return proxy('max')
+            return reject('max')
           }
-          if (isArray(rule.range) && (value < rule.range[0] || value > rule.range[1])) {
-            return proxy('range')
+          if (isArray(range) && (value < range[0] || value > range[1])) {
+            return reject('range')
           }
+
+          resolve()
           break
         case 'remote':
-          if (isFunction(rule.remote)) {
-            rule.remote.call(this, value, ctx, function (boo) {
-              boo ? cb() : proxy('remote')
+          if (isFunction(remote)) {
+            remote.call(this, value, ctx, function (boo) {
+              boo ? resolve() : reject('remote')
             })
           }
           break
         case 'enum':
           if (isArray(rule.enum) && rule.enum.indexOf(value) === -1) {
-            return proxy('enum')
+            return reject('enum')
           }
+
+          resolve()
           break
         default:
           if (type in rules) {
             var res = rules[type].call(this, value, ctx)
             if (!res) {
-              return proxy(type)
+              return reject(type)
             }
           }
+
+          resolve()
           break
       }
     } else if (isRegExp(type)) {
       if (!type.test(value)) {
-        return proxy('regexp')
+        return reject('regexp')
       }
-    }
-  }
 
-  if (isFunction(rule.check)) {
-    if (!rule.check.call(this, value, ctx)) {
-      return proxy('check')
+      resolve()
     }
-  }
-
-  cb()
+  })
 }
 
 export default validate

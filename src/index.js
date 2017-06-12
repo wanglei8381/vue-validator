@@ -56,10 +56,8 @@ validator.install = function (Vue, options = {}) {
         key: key,
         // 当前绑定的节点
         target: el,
-        // 验证通过
-        pass: false,
         // 错误信息
-        msg: null,
+        msg: undefined,
         // 保存的值
         value: value,
         oldValue: value,
@@ -67,7 +65,6 @@ validator.install = function (Vue, options = {}) {
         rule: binding.arg,
         // 验证函数
         check: function () {
-          this.pass = !this.msg
           vm.errors[key] = this.msg
 
           // 对错误进行展示
@@ -103,8 +100,11 @@ validator.install = function (Vue, options = {}) {
       var validationModel = vm.__validationModel[binding.arg]
 
       if (validationModel) {
-        validate.call(vm, validationModel, context, function (validationError) {
-          context.msg = validationError
+        validate.call(vm, validationModel, context).then(() => {
+          context.msg = undefined
+          context.check()
+        }).catch((err) => {
+          context.msg = err
           context.check()
         })
       }
@@ -115,12 +115,14 @@ validator.install = function (Vue, options = {}) {
   })
 
   // 验证一个规则
-  Vue.prototype.$validate = function (ruleName, value, cb) {
-    if (!this.__validationModel || !(ruleName in this.__validationModel)) {
-      cb()
-    } else {
-      validate.call(this, this.__validationModel[ruleName], { value: value }, cb)
-    }
+  Vue.prototype.$validate = function (ruleName, value) {
+    return new Promise((resolve, reject) => {
+      if (!this.__validationModel || !(ruleName in this.__validationModel)) {
+        resolve()
+      } else {
+        validate.call(this, this.__validationModel[ruleName], { value: value }).then(resolve).catch(reject)
+      }
+    })
   }
 
   // 初始化验证规则
@@ -131,35 +133,36 @@ validator.install = function (Vue, options = {}) {
     }
   }
 
-  // 验证所有规则是否通过,返回true:通过,false:不通过
-  // 不对remote规则异步校验,需要手动调用$validate验证一个规则
+  // 验证所有规则是否通过
   Vue.prototype.$isValid = function () {
-    if (!this.__validationModel) {
-      return true
-    }
+    return new Promise((resolve, reject) => {
+      if (!this.__validationModel) {
+        resolve()
+      } else {
+        // 实例对应对错误缓存对象
+        const errCache = cache[this._uid]
+        const promises = Object.keys(errCache).map((key) => new Promise((resolve, reject) => {
+          const context = errCache[key]
+          // 验证规则
+          const validationModel = this.__validationModel[context.rule]
+          if (validationModel) {
+            validate.call(this, validationModel, context).then(() => {
+              context.msg = undefined
+              context.check()
+              resolve()
+            }).catch((err) => {
+              context.msg = err
+              context.check()
+              reject(err)
+            })
+          } else {
+            resolve()
+          }
+        }))
 
-    var pass = true
-    var errorCache = cache[this._uid]
-
-    for (var key in errorCache) {
-      var errorObj = errorCache[key]
-
-      // 验证规则
-      var validationModel = this.__validationModel[errorObj.rule]
-
-      if (validationModel) {
-        validate.call(this, validationModel, errorObj, function (validationError) {
-          errorObj.msg = validationError
-          errorObj.check()
-        })
+        Promise.all(promises).then(resolve).catch(reject)
       }
-
-      if (!errorObj.pass) {
-        pass = false
-      }
-    }
-
-    return pass
+    })
   }
 }
 

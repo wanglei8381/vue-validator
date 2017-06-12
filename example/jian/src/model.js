@@ -10,7 +10,10 @@ var model = {
     msg: { 'required': '必填' }
   },
   color: {
-    required: true
+    check (val) {
+      return val != 0
+    },
+    msg: { check: '必填'}
   },
   mobile: {
     required: true,

@@ -11,7 +11,8 @@ Vue.use(vueValidator, {
     required: '必填',
     mobile: '手机格式不正确',
     remote: '手机号不存在',
-    enum: '请选择一个'
+    enum: '请选择一个',
+    check: '检查失败'
   }
 })
 

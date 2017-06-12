@@ -16,7 +16,7 @@
       <label><input type="checkbox" v-model="colors" value="红">红</label>
       <label><input type="checkbox" v-model="colors" value="黄">黄</label>
       <label><input type="checkbox" v-model="colors" value="白">白</label>
-      <label><input v-validator:color="colors" type="checkbox" v-model="colors" value="黑">黑</label>
+      <label><input v-validator:color="colors.length" type="checkbox" v-model="colors" value="黑">黑</label>
     </li>
     <li>mobile:
       <label><input v-validator:mobile="mobile" type="text" v-model="mobile"></label>

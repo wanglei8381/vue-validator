@@ -48,7 +48,7 @@ validator.install = function (Vue, options = {}) {
       if (!key) {
         key = binding.arg
       }
-      Vue.set(vm[field], key, '')
+      Vue.set(vm[field], key, undefined)
 
       // 设置一份上下文, 用于通信
       const context = errorCache[id] = {
@@ -153,7 +153,7 @@ validator.install = function (Vue, options = {}) {
             }).catch((err) => {
               context.msg = err
               context.check()
-              reject(err)
+              reject(new Error(err))
             })
           } else {
             resolve()

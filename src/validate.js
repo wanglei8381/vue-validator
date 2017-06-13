@@ -33,16 +33,8 @@ function validate (rule, ctx) {
 
     let { value } = ctx
 
-    if (isEmpty(value)) {
-      value = rule.default
-    }
-
-    if (isEmpty(value)) {
-      if (required) {
-        return proxy('required')
-      } else {
-        return resolve()
-      }
+    if (isEmpty(value) && required) {
+      return proxy('required')
     }
 
     // 验证类型，默认是string
@@ -100,8 +92,7 @@ function verify (type, value, ctx, rule) {
           resolve()
           break
         case 'number':
-          value = Number(value)
-          if (!value) {
+          if (!isNumber(value)) {
             return reject('number')
           }
           if (isNumber(min) && value < min) {

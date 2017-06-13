@@ -107,10 +107,9 @@ errors的key的可以这样设置如下：
 
 > 规则
 
-1. default: 默认值，当value为空时取值
-2. required: 是否必填，默认false
-3. type: 类型，已有的类型：string(默认)，number，regexp，remote，enum
-4. check函数, 返回true或false
+1. required: 是否必填，默认false
+2. type: 类型，已有的类型：string(默认)，number，regexp，remote，enum
+3. check函数, 返回true或false
 
 > type: string 默认
 

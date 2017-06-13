@@ -1,7 +1,9 @@
 module.exports = {
-  "files": {
+  files: {
     "example/jian/src/index.js": 1
   },
 
-  "index": "example/jian/index.html"
+  coverage: true,
+
+  index: "example/jian/index.html"
 }

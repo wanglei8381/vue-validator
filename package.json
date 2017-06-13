@@ -1,7 +1,7 @@
 {
   "name": "vue-lite-validator",
   "description": "Simple Vue.js input validation plugin",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "src/index.js",
   "keywords": [
     "VueJS",
@@ -19,7 +19,6 @@
     "url": "https://github.com/wanglei8381/vue-validator/issues"
   },
   "scripts": {
-    "dev": "wag dev",
     "start": "wag start",
     "build": "wag build --remove",
     "test": "wag test"

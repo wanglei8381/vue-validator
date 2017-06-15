@@ -5,7 +5,7 @@
     <li v-validator:color="color">color</li>
     <li v-validator:mobile="mobile">mobile</li>
     <li v-validator:num="num">number</li>
-    <li v-validator:money="money">money</li>
+    <li v-validator:money="money">buildinRule</li>
     <li v-validator:ip="ip">ip</li>
     <li v-validator:idcard="idcard">idcard</li>
   </ul>

@@ -3,7 +3,7 @@ import Vue from 'vue'
 import vueValidator from '@/src'
 import App from './App.vue'
 
-Vue.use(vueValidator, {
+let options = {
   autoHint: true,
   field: 'errors',
   messages: {
@@ -13,7 +13,9 @@ Vue.use(vueValidator, {
     enum: '请选择一个',
     check: '检查失败'
   }
-})
+}
+
+Vue.use(vueValidator, options)
 
 function hasKey (obj, key) {
   return obj.hasOwnProperty(key)
@@ -38,9 +40,7 @@ describe('vue-lite-validator', () => {
   })
 
   vm.$isValid().then(() => {
-    console.log('---===OK===---')
   }).catch(() => {
-    console.log('---===FAIL===---')
   })
 
   it('rule[required]', (done) => {
@@ -228,6 +228,98 @@ describe('vue-lite-validator', () => {
     next(() => {
       expect(vm.errors.idcard)
         .to.equal('idcard')
+
+      done()
+    })
+  })
+
+  it('rule[doVerify:false]', (done) => {
+    vm.$validate('before', false).then(done).catch(done)
+  })
+
+  it('rule[doVerify:true]', (done) => {
+    vm.$validate('before', true).then(done).catch((err) => {
+      expect(err.message)
+        .to.equal('doVerify')
+      done()
+    })
+  })
+
+  it('not init validator', (done) => {
+    const vm2 = new Vue({
+      render () {
+        return <h1></h1>
+      }
+    }).$mount()
+
+    vm2.$isValid().then(done).catch(done)
+  })
+
+  it('$isValid: rule not exist', (done) => {
+    options.autoHint = false
+    new Vue({
+      data: {
+        title: ''
+      },
+
+      render () {
+        const directives = [
+          { name: 'validator', value: this.title, arg: 'title' }
+        ]
+        return <h1 {...{ directives }} ></h1>
+      },
+
+      beforeCreate () {
+        this.$initValidate({})
+      },
+
+      mounted () {
+        this.$isValid().then(done).catch(done)
+      }
+    }).$mount()
+  })
+
+  it('$isValid: all rules pass', (done) => {
+    options.autoHint = false
+    new Vue({
+      data: {
+        title: 'abc'
+      },
+
+      render () {
+        const directives = [
+          { name: 'validator', value: this.title, arg: 'title' }
+        ]
+        return <h1 {...{ directives }} ></h1>
+      },
+
+      beforeCreate () {
+        this.$initValidate({
+          title: {}
+        })
+      },
+
+      mounted () {
+        this.$isValid().then(done).catch(done)
+      }
+    }).$mount()
+  })
+
+  it('$validate: rule not exist', (done) => {
+    vm.$validate('mobile2', '18210695333').then(done).catch(done)
+  })
+
+  it('$validate: ok', (done) => {
+    vm.$validate('mobile', '13033333333').then(done).catch(done)
+  })
+
+  it('destroy', (done) => {
+    var uid = vm._uid
+    vm.$destroy()
+
+    next(() => {
+      expect(Object.keys(Vue.errorCache[uid]).length === 0)
+        .to.be.true
 
       done()
     })

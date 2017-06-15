@@ -20,6 +20,8 @@ validator.install = function (Vue, options = {}) {
   // 错误缓存对象
   const cache = {}
 
+  Vue.errorCache = cache
+
   // 给vue实例添加errors属性
   Vue.mixin({
     data () {
@@ -110,7 +112,7 @@ validator.install = function (Vue, options = {}) {
       }
     },
     unbind: function (el, binding, vnode) {
-      cache[vnode.context._uid][el._erruid] = null
+      delete cache[vnode.context._uid][el._erruid]
     }
   })
 
@@ -120,7 +122,9 @@ validator.install = function (Vue, options = {}) {
       if (!this.__validationModel || !(ruleName in this.__validationModel)) {
         resolve()
       } else {
-        validate.call(this, this.__validationModel[ruleName], { value: value }).then(resolve).catch(reject)
+        validate.call(this, this.__validationModel[ruleName], { value: value }).then(resolve).catch((err) => {
+          reject(new Error(err))
+        })
       }
     })
   }
@@ -160,7 +164,7 @@ validator.install = function (Vue, options = {}) {
           }
         }))
 
-        Promise.all(promises).then(resolve).catch(reject)
+        Promise.all(promises).then(() => { resolve() }).catch(reject)
       }
     })
   }

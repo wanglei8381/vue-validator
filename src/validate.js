@@ -24,7 +24,8 @@ function validate (rule, ctx) {
       msg = messages,
       required,
       type,
-      check
+      check,
+      doVerify
     } = rule
 
     let proxy = (key) => {
@@ -32,6 +33,12 @@ function validate (rule, ctx) {
     }
 
     let { value } = ctx
+
+    if (isFunction(doVerify)) {
+      if (!doVerify.call(this, value, ctx)) {
+        return resolve()
+      }
+    }
 
     if (isEmpty(value) && required) {
       return proxy('required')
@@ -51,9 +58,8 @@ function validate (rule, ctx) {
 
     Promise.all(promises).then(() => {
       if (isFunction(check)) {
-        if (!check.call(this, value, ctx)) {
-          return proxy('check')
-        }
+        var boo = check.call(this, value, ctx)
+        return isString(boo) ? reject(boo) : boo ? resolve() : proxy('check')
       }
 
       resolve()
@@ -110,7 +116,7 @@ function verify (type, value, ctx, rule) {
         case 'remote':
           if (isFunction(remote)) {
             remote.call(this, value, ctx, function (boo) {
-              boo ? resolve() : reject('remote')
+              isString(boo) ? reject(boo) : boo ? resolve() : reject('remote')
             })
           }
           break

@@ -111,6 +111,16 @@ errors的key的可以这样设置如下：
 2. type: 类型，已有的类型：string(默认)，number，regexp，remote，enum
 3. check函数, 返回true或false
 
+> doVerify函数 返回值boolean
+
+true：校验该规则（默认值）
+false: 不检验该规则
+
+this指向当前vue实例，第一个参数val,第二个参数ctx
+
+check,remote函数和doVerify的上下文和参数一样
+
+
 > type: string 默认
 
 1. minlength: 0 最小长度0
@@ -194,7 +204,7 @@ type: ['mobile', 'remote']
 
 > check函数
 
-在一些复杂情况下可以使用check函数校验, 返回true或false
+在一些复杂情况下可以使用check函数校验, 返回值可以字符串错误信息，也可以是true或false，当时false时取msg中的check错误信息
 ```
 {
   check (val) {

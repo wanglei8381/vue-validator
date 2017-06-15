@@ -48,5 +48,13 @@ export default {
   idcard: {
     type: 'idcard',
     msg: { idcard: 'idcard' }
+  },
+  before: {
+    doVerify (val) {
+      return !!val
+    },
+    check () {
+      return 'doVerify'
+    }
   }
 }

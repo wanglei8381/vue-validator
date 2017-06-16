@@ -112,6 +112,8 @@ validator.install = function (Vue, options = {}) {
       }
     },
     unbind: function (el, binding, vnode) {
+      const context = cache[vnode.context._uid][el._erruid]
+      delete vnode.context[field][context.key]
       delete cache[vnode.context._uid][el._erruid]
     }
   })

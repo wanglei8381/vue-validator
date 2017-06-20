@@ -28,7 +28,7 @@
       <label><input v-validator:repwd="repwd" type="text" v-model="repwd"></label>
     </li>
     <li>复杂的验证:
-      <label><input v-validator:more="more" type="text" v-model="more"></label>
+      <label><input v-validator:more="more" type="text" v-model.number="more"></label>
     </li>
     <li>
       <button @click="submit" type="button">SUBMIT</button>

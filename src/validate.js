@@ -5,7 +5,8 @@ import {
   isArray,
   isFunction,
   isEmpty,
-  isNumber
+  isNumber,
+  series
 } from './util'
 
 import { rules } from './buildinRule'
@@ -54,9 +55,9 @@ function validate (rule, ctx) {
       types = ['string']
     }
 
-    let promises = types.map((type) => verify.call(this, type, value, ctx, rule))
+    let promises = types.map((type) => verify.bind(this, type, value, ctx, rule))
 
-    Promise.all(promises).then(() => {
+    series(promises).then(() => {
       if (isFunction(check)) {
         var boo = check.call(this, value, ctx)
         return isString(boo) ? reject(boo) : boo ? resolve() : proxy('check')

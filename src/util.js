@@ -30,3 +30,38 @@ export function isEmpty (obj) {
   if (typeof obj.length === 'number') return obj.length === 0
   return false
 }
+
+/**
+ * promise 顺序懒执行
+ * @param tasks 函数列表，返回Promise
+ * @returns {Promise}
+ */
+export function series (tasks) {
+  return new Promise((resolve, reject) => {
+    if (Array.isArray(tasks)) {
+      var result = []
+      var i = 0
+      var length = tasks.length
+      if (length === 0) {
+        return resolve(result)
+      }
+
+      function run () {
+        var task = tasks[i]
+        Promise.resolve(task()).then((res) => {
+          result[i] = res
+          i++
+          if (i < length) {
+            run()
+          } else {
+            resolve(result)
+          }
+        }).catch(reject)
+      }
+
+      run()
+    } else {
+      reject(new Error('Series Methods must be provided an Array'))
+    }
+  })
+}

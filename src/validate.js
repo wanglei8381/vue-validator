@@ -29,8 +29,12 @@ function validate (rule, ctx) {
       doVerify
     } = rule
 
-    let proxy = (key) => {
-      reject(msg[key] || messages[key])
+    let proxy = (err) => {
+      if (isString(err)) {
+        reject(msg[err] || messages[err])
+      } else {
+        reject(err.message)
+      }
     }
 
     let { value } = ctx
@@ -117,7 +121,7 @@ function verify (type, value, ctx, rule) {
         case 'remote':
           if (isFunction(remote)) {
             remote.call(this, value, ctx, function (boo) {
-              isString(boo) ? reject(boo) : boo ? resolve() : reject('remote')
+              isString(boo) ? reject(new Error(boo)) : boo ? resolve() : reject('remote')
             })
           }
           break
@@ -130,10 +134,8 @@ function verify (type, value, ctx, rule) {
           break
         default:
           if (type in rules) {
-            var res = rules[type].call(this, value, ctx)
-            if (!res) {
-              return reject(type)
-            }
+            var boo = rules[type].call(this, value, ctx)
+            return isString(boo) ? reject(new Error(boo)) : boo ? resolve() : reject(type)
           }
 
           resolve()

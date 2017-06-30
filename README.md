@@ -113,12 +113,19 @@ errors的key的可以这样设置如下：
 
 > doVerify函数 返回值boolean
 
+是否校验该规则
+
+返回值：
 true：校验该规则（默认值）
 false: 不检验该规则
 
 this指向当前vue实例，第一个参数val,第二个参数ctx
 
 check,remote函数和doVerify的上下文和参数一样
+
+> format函数 返回值处理后的新值
+
+对输入的值预先处理一下，返回处理后的新值
 
 
 > type: string 默认

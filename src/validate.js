@@ -26,12 +26,13 @@ function validate (rule, ctx) {
       required,
       type,
       check,
-      doVerify
+      doVerify,
+      format
     } = rule
 
     let proxy = (err) => {
       if (isString(err)) {
-        reject(msg[err] || messages[err])
+        reject(msg[err] || messages[err] || '输入的值不合法')
       } else {
         reject(err.message)
       }
@@ -39,14 +40,26 @@ function validate (rule, ctx) {
 
     let { value } = ctx
 
+    // 是否需要验证
     if (isFunction(doVerify)) {
       if (!doVerify.call(this, value, ctx)) {
         return resolve()
       }
     }
 
-    if (isEmpty(value) && required) {
-      return proxy('required')
+    // 对数据进行处理
+    if (isFunction(format)) {
+      value = format.call(this, value, ctx)
+    }
+
+    if (isEmpty(value)) {
+      // 必填
+      if (required) {
+        return proxy('required')
+      } else if (required === false) { // required=undefined 忽略，继续校验下面的规则
+        // 声明式非必填，为空直接跳过
+        return resolve()
+      }
     }
 
     // 验证类型，默认是string

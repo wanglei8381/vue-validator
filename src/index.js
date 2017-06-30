@@ -125,7 +125,7 @@ validator.install = function (Vue, options = {}) {
         resolve()
       } else {
         validate.call(this, this.__validationModel[ruleName], { value: value }).then(resolve).catch((err) => {
-          reject(new Error(err))
+          reject(new Error('验证失败：' + err))
         })
       }
     })
@@ -159,7 +159,7 @@ validator.install = function (Vue, options = {}) {
             }).catch((err) => {
               context.msg = err
               context.check()
-              reject(new Error(err))
+              reject(new Error('验证失败：' + err))
             })
           } else {
             resolve()

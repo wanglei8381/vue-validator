@@ -1,8 +1,8 @@
 {
   "name": "vue-lite-validator",
   "description": "Simple Vue.js input validation plugin",
-  "version": "1.0.0",
-  "main": "src/index.js",
+  "version": "1.0.5",
+  "main": "dist/index.js",
   "keywords": [
     "VueJS",
     "Vue",
@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "wag start",
-    "build": "wag build --remove",
+    "build": "rollup -c",
     "test": "wag test"
   },
   "devDependencies": {

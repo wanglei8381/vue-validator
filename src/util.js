@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 const toString = (obj) => Object.prototype.toString.call(obj)
 
 export function isRegExp (obj) {
@@ -46,6 +47,8 @@ export function series (tasks) {
         return resolve(result)
       }
 
+      run()
+
       function run () {
         var task = tasks[i]
         Promise.resolve(task()).then((res) => {
@@ -58,8 +61,6 @@ export function series (tasks) {
           }
         }).catch(reject)
       }
-
-      run()
     } else {
       reject(new Error('Series Methods must be provided an Array'))
     }

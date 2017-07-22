@@ -7,7 +7,7 @@ export function addValidation (type, handler) {
 
 // 手机号(中国大陆)
 addValidation('mobile', function (value) {
-  return /^(\+?0?86-?)?((13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7})$/.test(value)
+  return /^(\+?0?86-?)?1[34578]\d{9}$/.test(value)
 })
 
 // 钱

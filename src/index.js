@@ -147,8 +147,14 @@ validator.install = function (Vue, options = {}) {
       } else {
         // 实例对应对错误缓存对象
         const errCache = cache[this._uid]
+        if (!errCache) {
+          return resolve()
+        }
         const promises = Object.keys(errCache).map((key) => new Promise((resolve, reject) => {
           const context = errCache[key]
+          if (!context) {
+            return resolve()
+          }
           // 验证规则
           const validationModel = this.__validationModel[context.rule]
           if (validationModel) {

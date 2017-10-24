@@ -28,8 +28,7 @@ function isNumber(obj) {
 }
 
 function isObject(obj) {
-  var type = typeof obj === 'undefined' ? 'undefined' : _typeof(obj);
-  return obj != null && type === 'object';
+  return obj != null && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object';
 }
 
 function isEmpty(obj) {
@@ -493,9 +492,15 @@ validator.install = function (Vue) {
       } else {
         // 实例对应对错误缓存对象
         var errCache = cache[_this2._uid];
+        if (!errCache) {
+          return resolve();
+        }
         var promises = Object.keys(errCache).map(function (key) {
           return new Promise(function (resolve, reject) {
             var context = errCache[key];
+            if (!context) {
+              return resolve();
+            }
             // 验证规则
             var validationModel = _this2.__validationModel[context.rule];
             if (validationModel) {

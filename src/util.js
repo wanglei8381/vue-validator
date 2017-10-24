@@ -22,8 +22,7 @@ export function isNumber (obj) {
 }
 
 export function isObject (obj) {
-  const type = typeof obj
-  return obj != null && type === 'object'
+  return obj != null && typeof obj === 'object'
 }
 
 export function isEmpty (obj) {

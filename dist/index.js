@@ -219,11 +219,6 @@ function validate(rule, ctx) {
       }
     }
 
-    // 对数据进行处理
-    if (isFunction(format)) {
-      value = format.call(_this, value, ctx);
-    }
-
     if (isEmpty(value)) {
       // 必填
       if (required) {
@@ -233,6 +228,11 @@ function validate(rule, ctx) {
         // 声明式非必填，为空直接跳过
         return resolve();
       }
+    }
+
+    // 对数据进行处理
+    if (isFunction(format)) {
+      value = format.call(_this, value, ctx);
     }
 
     // 验证类型，默认是string

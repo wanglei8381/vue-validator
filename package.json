@@ -1,7 +1,7 @@
 {
   "name": "vue-lite-validator",
   "description": "Simple Vue.js input validation plugin",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "main": "dist/index.js",
   "keywords": [
     "VueJS",
